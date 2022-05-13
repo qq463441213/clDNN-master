@@ -39,7 +39,7 @@ KERNEL(fully_connected_kernel_mmad_batched)(
 #endif
     )
 {
-    const uint sg_channel = get_sub_group_local_id();
+    const uint sg_channel = get_local_id(get_group_id(0));
 
     const uint batch_id = (uint)get_group_id(0) * 8;
     const uint b_block = batch_id / 4;

@@ -191,7 +191,7 @@ KERNEL (fully_connected_gpu_xb_xb_block_fp16)(
     // Identifier of batch group (each batch group process up to UNITS_PER_SG_READ data sets from batch).
     const uint batch_group_id = get_global_id(1);
     // Identifier of work item element in processing sub-group.
-    const uint sg_elem_id     = get_sub_group_local_id();
+    const uint sg_elem_id     = get_local_id(get_group_id(0));
 
     // Input base offset in bytes (yxfb/xb format of input).
     const uint input_base     = batch_group_id * BYTES_PER_SG_READ;

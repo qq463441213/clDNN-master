@@ -18,7 +18,9 @@
 
 KERNEL (permute_ref)(const __global UNIT_TYPE* input, __global UNIT_TYPE* output)
 {
-    uint4 input_indices, output_indices;
+    // uint4 input_indices, output_indices;
+    uint input_indices[4]; 
+    uint output_indices[4];
     
     input_indices[0] = get_global_id(0);
     input_indices[1] = get_global_id(1);

@@ -54,7 +54,7 @@ KERNEL(convolution_gpu_fs_byx_fsv32)(
     uint oc = get_global_id(0) * OUTPUT_BLOCK_WIDTH;
     uint or = get_global_id(1);
     uint fs_b_id = get_group_id(2);
-    uint sglid = get_sub_group_local_id();
+    uint sglid = get_local_id(get_group_id(0));
 
     uint fs = fs_b_id / INPUT0_BATCH_NUM;
     uint b = fs_b_id - fs * INPUT0_BATCH_NUM;

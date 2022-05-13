@@ -153,7 +153,7 @@ __global int8* weights,
 	ushort lid_x    = get_local_id(0);
 	ushort lid_z    = get_local_id(2);
 
-	uchar  lane_id  = get_sub_group_local_id();
+	uchar  lane_id  = get_local_id(get_group_id(0));
 
 	/* 32-bit signed accumulator , 112 output registers for 1Px7Qx4Nx32K output tile size
 	   Will be converted to 8-bits before final write */
@@ -1010,7 +1010,7 @@ __global int8* weights,
 						
 			__global uchar* output_write_ptr = (__global uchar *) &outputs [ slice_pack_addr_bytes + output_offset_x + output_offset_y ];
 
-                const uint feature = output_depth_index * 32 + get_sub_group_local_id();
+                const uint feature = output_depth_index * 32 + get_local_id(get_group_id(0));
 
                 const float4 quant_f = as_float4(intel_sub_group_block_read4((__global uint*) (quantizations + feature) ));
                 const float4 bias_f = as_float4(intel_sub_group_block_read4((__global uint*) (biases + feature) ));

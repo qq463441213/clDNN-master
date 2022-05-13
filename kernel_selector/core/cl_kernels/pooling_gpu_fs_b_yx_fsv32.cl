@@ -54,7 +54,7 @@ KERNEL(pooling_gpu_fs_b_yx_fsv32)(
     const uint out_y    = (uint)get_global_id(1);
     const uint bf       = (uint)get_global_id(2);
     const uint bfs      = bf / (REQD_FEATURE_SLICE_SIZE / REQD_FEATURES_PER_WORK_ITEM);
-    const uint sglid    = get_sub_group_local_id();
+    const uint sglid    = get_local_id(get_group_id(0));
 
     const uint b  = bfs % INPUT0_BATCH_NUM;
     const uint fs = bfs / INPUT0_BATCH_NUM;

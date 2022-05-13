@@ -68,8 +68,8 @@ KERNEL (reorder_data_to_yxfb_batched)(
 
     for(uint i = 0; i < OUTPUT_BATCH_NUM; i++)
     {
-        // uint output_idx = group_idx + get_sub_group_local_id(); @LY 2022/5/13
-        uint output_idx = group_idx + get_local_id(group_idx);
+        // uint output_idx = group_idx + get_local_id(get_group_id(0)); @LY 2022/5/13
+        uint output_idx = group_idx + get_local_id(get_group_id(0));
         if(output_idx >= ELEMENTS_COUNT)
             continue;
 

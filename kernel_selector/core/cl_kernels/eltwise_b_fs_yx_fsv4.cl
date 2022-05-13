@@ -19,7 +19,7 @@
 #define PACK 4
 
 #define SGR_MAX_SIZE   (get_max_sub_group_size())
-#define SGR_LOCAL_ID   (get_sub_group_local_id())
+#define SGR_LOCAL_ID   (get_local_id(get_group_id(0)))
 
 #define GET_INDEX(_x) \
    ( ((_x / SGR_MAX_SIZE) * SGR_MAX_SIZE /* Normed to max_subgroup_size */)   \

@@ -205,7 +205,7 @@ KERNEL (reorder_data_fast_b1)(
 #elif defined MEAN_SUBTRACT_IN_BUFFER
     MEAN_SUBTRACT_TYPE res = TO_MEAN_TYPE(input[input_idx]);
     uint4 msv = FUNC_CALL(reshape_dims)(b,f,y,x, INPUT0_SIZE_Y, INPUT0_SIZE_X, MEAN_SUBTRACT_SIZE_Y, MEAN_SUBTRACT_SIZE_X, INPUT0_DIMS, MEAN_SUBTRACT_DIMS);
-    res -= mean_subtract[GET_DATA_INDEX_SAFE(MEAN_SUBTRACT, msv[0], msv[1], msv[2], msv[3])];
+    res -= mean_subtract[GET_DATA_INDEX_SAFE(MEAN_SUBTRACT, msv.s0, msv.s1, msv.s2, msv.s3)];
 #else
     CALC_TYPE res = TO_CALC_TYPE(input[input_idx]);
 #endif

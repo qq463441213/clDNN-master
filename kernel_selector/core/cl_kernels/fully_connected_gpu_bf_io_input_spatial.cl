@@ -44,11 +44,11 @@ KERNEL (fully_connected_gpu_bf_io_input_spatial)(
     const uint outXIdx = batch_id * FILTER_OFM_NUM + x;
     ACC_TYPE result = UNIT_VAL_ZERO;
 
-    uint input_idx = batch_id * INPUT0_ELEMENTS_COUNT + get_sub_group_local_id();
+    uint input_idx = batch_id * INPUT0_ELEMENTS_COUNT + get_local_id(get_group_id(0));
     input_idx = MULTIPLY_OFFSET(UNIT_TYPE, input_idx);
     uint weight_idx = MULTIPLY_OFFSET(UNIT_TYPE, outXIdx);
     const uint weight_idx_base = weight_idx;
-    uint s_w_idx = MULTIPLY_OFFSET(UNIT_TYPE, get_group_id(0) * 16 + get_sub_group_local_id() * FILTER_OFM_NUM);
+    uint s_w_idx = MULTIPLY_OFFSET(UNIT_TYPE, get_group_id(0) * 16 + get_local_id(get_group_id(0)) * FILTER_OFM_NUM);
     const uint input_slices = INPUT0_ELEMENTS_COUNT / 16;
     for (uint i = 0; i < input_slices; i++)
     {
@@ -58,14 +58,14 @@ KERNEL (fully_connected_gpu_bf_io_input_spatial)(
         {
             UNIT_TYPE _in = intel_sub_group_shuffle(_inG, j);
             uint wi_w_addr = intel_sub_group_shuffle(it_w_addr, j);
-            wi_w_addr += MULTIPLY_OFFSET(UNIT_TYPE, get_sub_group_local_id());
+            wi_w_addr += MULTIPLY_OFFSET(UNIT_TYPE, get_local_id(get_group_id(0)));
             UNIT_TYPE _w = *OFFSET_GLOBAL_PTR(UNIT_TYPE, weight, wi_w_addr);
             result += _in * _w;
         }
         input_idx  += MULTIPLY_OFFSET(UNIT_TYPE, 16);
         s_w_idx += MULTIPLY_OFFSET(UNIT_TYPE, FILTER_OFM_NUM * 16);
     }
-    input_idx -=  MULTIPLY_OFFSET(UNIT_TYPE, get_sub_group_local_id());
+    input_idx -=  MULTIPLY_OFFSET(UNIT_TYPE, get_local_id(get_group_id(0)));
     weight_idx += MULTIPLY_OFFSET(UNIT_TYPE, input_slices * FILTER_OFM_NUM);
     for (uint i = 0; i < INPUT0_ELEMENTS_COUNT % 16; i++)
     {

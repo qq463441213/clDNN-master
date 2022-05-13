@@ -52,7 +52,8 @@ KERNEL(arg_max_min_opt)(const __global UNIT_TYPE* input, __global uint* output)
 {
     const uint input_size = INPUT0_FEATURE_NUM * INPUT0_SIZE_X * INPUT0_SIZE_Y;
     const uint gid = get_group_id(0);
-    const uint lid = get_sub_group_local_id();
+    // const uint lid = get_local_id(get_group_id(0));
+    const uint lid = get_local_id(get_group_id(0));
 
     UNIT_TYPE input_blocks[INB_ARRAY_SIZE];
     uint indices[INB_ARRAY_SIZE];

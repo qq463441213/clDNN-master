@@ -102,7 +102,7 @@ __global int8* weights,
     Verify sub_group_layout through below printfs 
 	
 	if(group_z == 0 && group_y == 0 && fmg == 0 && get_sub_group_id() == 31) { 
-			printf("\n sub_group_local_id: %d, lid_x: %d, lid_y: %d, lid_z: %d ", get_sub_group_local_id(), get_local_id(0) ,get_local_id(1),get_local_id(2));	
+			printf("\n sub_group_local_id: %d, lid_x: %d, lid_y: %d, lid_z: %d ", get_local_id(get_group_id(0)), get_local_id(0) ,get_local_id(1),get_local_id(2));	
 			printf("\n #WorkgroupsX: %d, #WorkgroupsY: %d, #WorkgroupsZ: %d",get_num_groups(0),get_num_groups(1),get_num_groups(2)); 	
 	}
 	
@@ -120,7 +120,7 @@ __global int8* weights,
 	ushort lid_x    = get_local_id(0);
 	ushort lid_z    = get_local_id(2);
 
-	uchar  lane_id  = get_sub_group_local_id();
+	uchar  lane_id  = get_local_id(get_group_id(0));
 
 	/* 32-bit signed accumulator for 4 mini-batches , for a thread OUT_BLOCK_WIDTH*HEIGHT*4 registers are used
 	   Will be converted to 8-bits before final write														*/

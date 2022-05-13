@@ -211,7 +211,7 @@ KERNEL(Kernel_GEMM_MMAD8_32x32SG_128x128WG_SLM_INT8)
     const uint l_tid = l_tidY * get_local_size(DIM_X) + l_tidX; // 0,1,2,...127
 
     // SubGroup IDs
-    const uint sg_tid = get_sub_group_local_id();            // 0,1,...,8
+    const uint sg_tid = get_local_id(get_group_id(0));            // 0,1,...,8
     const uint sg_global_idX = (uint)(g_tidX / SG_SIZE);     //{0}/8
     const uint sg_global_idY = g_tidY;                       //{0}
 
@@ -344,7 +344,7 @@ KERNEL(Kernel_GEMM_MMAD8_32x32SG_128x128WG_SLM_INT8)
 
     const uint workgroup_id_x = get_group_id(0); 
     uint feature_off = 32*(sub_group_id % (WG_TILE_N / 32)) + WG_TILE_N*workgroup_id_x; //=32*{0,1,2,3} + WG_TILE_N * workgroup_id_x 
-    uint feature = get_sub_group_local_id()*4 + feature_off;
+    uint feature = get_local_id(get_group_id(0))*4 + feature_off;
 
     float4 quant_f = vload4(0, quantizations + feature);
     float4 bias_f = vload4(0, biases + feature);

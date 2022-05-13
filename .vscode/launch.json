@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceRoot}/build/out/Linux64/Debug/tests64",
-            "args": ["--gtest_filter=broadcast_gpu.basic_error_wrong_b_axes_size"],
+            "args": ["--gtest_filter=reshape_gpu_f32.multiple_users_with_reorder"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],

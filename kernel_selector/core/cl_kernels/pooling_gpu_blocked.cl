@@ -31,7 +31,7 @@ __attribute__((intel_reqd_sub_group_size(SUB_GROUP_SIZE)))
 KERNEL(pooling_gpu_blocked)(const __global UNIT_TYPE* input, __global UNIT_TYPE* output)
 {
 
-    const int lid = get_sub_group_local_id();
+    const int lid = get_local_id(get_group_id(0));
     const int f_block = get_group_id(1);
     const int b = get_global_id(2);
 

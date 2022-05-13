@@ -50,7 +50,7 @@ KERNEL (fully_connected_gpu_yxfn)(
             for(uint i = 0; i < INPUT0_SIZE_X; i++)
             {
                 uint4 widx = FUNC(reshape_dims)(batch_id, k,j,i, INPUT0_SIZE_Y, INPUT0_SIZE_X, FILTER_SIZE_Y, FILTER_SIZE_X, INPUT0_DIMS, FILTER_DIMS);
-                uint weight_idx = weight_offset + widx[1]*FILTER_IFM_PITCH + widx[2]*FILTER_Y_PITCH + widx[3]*FILTER_X_PITCH;
+                uint weight_idx = weight_offset + widx.s1*FILTER_IFM_PITCH + widx.s2*FILTER_Y_PITCH + widx.s3*FILTER_X_PITCH;
                 uint input_idx = INPUT0_OFFSET + k*INPUT0_FEATURE_PITCH + j*INPUT0_Y_PITCH + i*INPUT0_X_PITCH + batch_id*INPUT0_BATCH_PITCH;
                 result += input[input_idx] * weights[weight_idx];
             }

@@ -27,7 +27,7 @@ KERNEL(softmax_items_class_optimized)(__global INPUT0_TYPE* input, __global OUTP
     const uint other0 = get_group_id(0);
     const uint other1 = get_group_id(1);
     const uint batch  = get_group_id(2);
-    const uint simd_lane = get_sub_group_local_id();
+    const uint simd_lane = get_local_id(get_group_id(0));
 
     const uint in_depth_offset  = batch*INPUT0_BATCH_PITCH + other1*INPUT0_OTHER1_PITCH + other0*INPUT0_OTHER0_PITCH + INPUT0_OFFSET;
     const uint out_depth_offset = batch*OUTPUT_BATCH_PITCH + other1*OUTPUT_OTHER1_PITCH + other0*OUTPUT_OTHER0_PITCH + OUTPUT_OFFSET;

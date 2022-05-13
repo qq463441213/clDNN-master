@@ -143,7 +143,7 @@ KERNEL(convolution_gpu_byx8_f4_fs_bs_yx_bsv4_fsv32)(
     }
 
 
-const uint sg_local_f = get_sub_group_local_id() * 4;
+const uint sg_local_f = get_local_id(get_group_id(0)) * 4;
 float4 quant_f = vload4(0, quantizations + f + sg_local_f);
 float4 bias_f = vload4(0, biases + f + sg_local_f);
 float4 calib_f = vload4(0, calibrations + f + sg_local_f);

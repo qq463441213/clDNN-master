@@ -16,19 +16,19 @@
 
 void FUNC(intel_sub_group_block_write_4)( __local uint* p, uint4 data )
 {
-    p[ get_sub_group_local_id() ] = data.s0;
+    p[ get_local_id(get_group_id(0)) ] = data.s0;
     p += 8;
-    p[ get_sub_group_local_id() ] = data.s1;
+    p[ get_local_id(get_group_id(0)) ] = data.s1;
     p += 8;
-    p[ get_sub_group_local_id() ] = data.s2;
+    p[ get_local_id(get_group_id(0)) ] = data.s2;
     p += 8;
-    p[ get_sub_group_local_id() ] = data.s3;
+    p[ get_local_id(get_group_id(0)) ] = data.s3;
 }
 
 uint4 FUNC(intel_sub_group_block_read_uint4)(const __local uint* p)
 {
     uint4 ret;
-    uint idx = get_sub_group_local_id();
+    uint idx = get_local_id(get_group_id(0));
 
     ret.s0 = p[idx]; idx += get_max_sub_group_size();
     ret.s1 = p[idx]; idx += get_max_sub_group_size();
@@ -41,7 +41,7 @@ uint4 FUNC(intel_sub_group_block_read_uint4)(const __local uint* p)
 uint8 FUNC(intel_sub_group_block_read_uint8)(const __local uint* p)
 {
     uint8 ret;
-    uint idx = get_sub_group_local_id();
+    uint idx = get_local_id(get_group_id(0));
 
     ret.s0 = p[idx]; idx += get_max_sub_group_size();
     ret.s1 = p[idx]; idx += get_max_sub_group_size();
@@ -122,7 +122,7 @@ inline void FUNC(sub_group_block_write_uchar8)(__global uchar* outPtr, uchar8 v)
 #ifdef cl_intel_subgroups_char
     intel_sub_group_block_write_uc8(outPtr, v);
 #else
-    uint idx = get_sub_group_local_id();
+    uint idx = get_local_id(get_group_id(0));
 
 	outPtr[idx] = v.s0; idx += get_max_sub_group_size();
     outPtr[idx] = v.s1; idx += get_max_sub_group_size();
@@ -140,7 +140,7 @@ inline uchar8 FUNC(sub_group_block_read_uchar8)(const __global uchar* ptr)
 #ifdef cl_intel_subgroups_char
     return intel_sub_group_block_read_uc8(ptr);
 #else
-    uint idx = get_sub_group_local_id();
+    uint idx = get_local_id(get_group_id(0));
 
     uchar8 ret;
 

@@ -56,7 +56,7 @@ KERNEL (fully_connected_gpu_xb_bs_xs_xsv8_bsv16_vload)(
     const uint global_id = get_global_id(0);
     const uint group_id = get_group_id(0);
     const uint batch_group_id = get_global_id(1); // which part of batches we are computing, for example for batch 64 we compute batches 0..31 for batch_group_id == 0 and batches 32..65 for batch_group_id == 1
-    const uint id_in_sub_group = get_sub_group_local_id();
+    const uint id_in_sub_group = get_local_id(get_group_id(0));
 
     const uint out_id = (id_in_sub_group * BATCHES_PER_WORK_ITEM * (uint)get_global_size(1)) / SUB_GROUP_SIZE + group_id * BATCHES_PER_WORK_ITEM * (uint)get_global_size(1) + (BATCHES_PER_WORK_ITEM * batch_group_id) / SUB_GROUP_SIZE;
 

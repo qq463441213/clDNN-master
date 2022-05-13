@@ -50,7 +50,7 @@ KERNEL(convolution)(
         const int input_offset_y = input_y + j;
         for (uint i = 0; i < FILTER_SIZE_X ; ++i)
         {
-            const int input_offset_x = input_x + i + STRIDE_SIZE_X * get_sub_group_local_id();
+            const int input_offset_x = input_x + i + STRIDE_SIZE_X * get_local_id(get_group_id(0));
             uint input_idx = input_offset + (uint)input_offset_x*INPUT0_X_PITCH + (uint)input_offset_y*INPUT0_Y_PITCH;
             uint filter_idx = filter_offset + j*FILTER_Y_PITCH + i*FILTER_X_PITCH;
 
@@ -77,8 +77,8 @@ KERNEL(convolution)(
     }
 
 
-const uint dst_index = GET_DATA_FS_BS_YX_BSV4_FSV32_INDEX(OUTPUT, b, f_pack, y, x + get_sub_group_local_id());
-const uint _f_idx = f_pack + get_sub_group_local_id() * 4;
+const uint dst_index = GET_DATA_FS_BS_YX_BSV4_FSV32_INDEX(OUTPUT, b, f_pack, y, x + get_local_id(get_group_id(0)));
+const uint _f_idx = f_pack + get_local_id(get_group_id(0)) * 4;
 float4 quants = vload4(0, quantizations + _f_idx );
 float4 calibs = vload4(0, calibrations + _f_idx );
 float4 bias = vload4(0, biases + _f_idx );
@@ -87,7 +87,7 @@ for(uint r = 0; r < OBS; r++)
     char4 char_output;
     for(uint c = 0; c < 4; c++)
     {
-        const uint f_idx = f_pack + get_sub_group_local_id() * 4 + c;
+        const uint f_idx = f_pack + get_local_id(get_group_id(0)) * 4 + c;
     #if BIAS_TERM
         const uint bias_index = f_idx;
     #if CALIBRATION_TERM

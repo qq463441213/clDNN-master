@@ -72,10 +72,10 @@ KERNEL(convolution_bfyx_1x1)(
 #endif
     uint split_idx)
 {
-    const uint xy = get_group_id(0) * 16 + get_sub_group_local_id();
+    const uint xy = get_group_id(0) * 16 + get_local_id(get_group_id(0));
     const uint x = xy % OUTPUT_SIZE_X;
     const uint y = xy / OUTPUT_SIZE_X;
-    const uint f = get_group_id(1) * 16 + get_sub_group_local_id();//get_global_id(1);
+    const uint f = get_group_id(1) * 16 + get_local_id(get_group_id(0));//get_global_id(1);
     const uint b = get_global_id(2);
     const uint group_f = get_group_id(1) * 16;
 

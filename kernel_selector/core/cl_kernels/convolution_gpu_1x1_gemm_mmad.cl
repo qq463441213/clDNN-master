@@ -39,7 +39,7 @@ KERNEL(convolution_1x1_gemm_MMAD)(
 #endif
     uint split_idx)
 {
-    const uint sg_channel = get_sub_group_local_id();
+    const uint sg_channel = get_local_id(get_group_id(0));//get_local_id(get_group_id(0));
 
     const uint x = (get_group_id(0) * 8) % INPUT0_SIZE_X;
     const uint y = (get_group_id(0) * 8) / INPUT0_SIZE_X;

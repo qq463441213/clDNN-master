@@ -34,7 +34,7 @@ KERNEL(convolution_bfyx_f16)(
     uint split_idx)
 {
     const int f_block = get_group_id(1);
-    const int lid = get_sub_group_local_id();
+    const int lid = get_local_id(get_group_id(0));
     const int b = get_global_id(2);
 
     const int xy = get_global_id(0);

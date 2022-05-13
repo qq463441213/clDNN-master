@@ -184,7 +184,7 @@ KERNEL (fully_connected_gpu_bx_bs_x_bsv16_b1)(
     const uint output_size      = FILTER_OFM_NUM;
 
     // Identifier of work item element in processing sub-group.
-    const uint sg_elem_id       = get_sub_group_local_id();
+    const uint sg_elem_id       = get_local_id(get_group_id(0));
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -314,7 +314,7 @@ KERNEL (fully_connected_gpu_bx_bs_x_bsv16_b1)(
                 const uint input_base_elem_idx = elem_base_idx + filter_val_idx * UNITS_PER_SG_READ / RESPONSES_PER_SG_EXEC;
 
                 // Select different input for every SUB_GROUP_SIZE * RESPONSES_PER_SG_EXEC / UNITS_PER_SG_READ work-items in sub-group.
-                // This code is suboptimal because get_sub_group_local_id() is not treated as constexpr (compiler issue).
+                // This code is suboptimal because get_local_id(get_group_id(0)) is not treated as constexpr (compiler issue).
 #if UNITS_PER_SG_READ / RESPONSES_PER_SG_EXEC == 4
                 UNIT_TYPE rearranged_input = sg_elem_id < SUB_GROUP_SIZE / 2
                     ? (sg_elem_id < SUB_GROUP_SIZE / 4
@@ -431,7 +431,7 @@ KERNEL (fully_connected_gpu_bx_bs_x_bsv16_b1)(
                 const uint input_base_elem_idx = elem_base_idx + filter_val_idx * UNITS_PER_SG_READ / RESPONSES_PER_SG_EXEC;
 
                 // Select different input for every SUB_GROUP_SIZE * RESPONSES_PER_SG_EXEC / UNITS_PER_SG_READ work-items in sub-group.
-                // This code is suboptimal because get_sub_group_local_id() is not treated as constexpr (compiler issue).
+                // This code is suboptimal because get_local_id(get_group_id(0)) is not treated as constexpr (compiler issue).
 #if UNITS_PER_SG_READ / RESPONSES_PER_SG_EXEC == 4
                 UNIT_TYPE rearranged_input = sg_elem_id < SUB_GROUP_SIZE / 2
                     ? (sg_elem_id < SUB_GROUP_SIZE / 4

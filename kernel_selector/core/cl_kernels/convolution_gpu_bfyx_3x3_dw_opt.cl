@@ -62,7 +62,7 @@ KERNEL(convolution_gpu_bfyx_3x3_dw_opt)(
     const int base_offset = -base_addr_offset * UNIT_BYTE_SIZE;
 
 #if FP16_UNIT_USED
-    const uint lid = get_sub_group_local_id();
+    const uint lid = get_local_id(get_group_id(0));
     if(input_offset_const - base_addr_offset >= 0)
         input_buffer[0] = input[input_offset_const - base_addr_offset + lid];
     if(input_offset_const >= 0)

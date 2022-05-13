@@ -63,7 +63,7 @@ KERNEL(fused_conv_eltwise_gpu_bfyx_1x1_opt)(
     {
         for(uint i = 0; i < OUT_BLOCK_HEIGHT; i++)
         {
-            const uint in_offset = input_offset + get_sub_group_local_id() + i * INPUT0_Y_PITCH + k * INPUT0_FEATURE_PITCH;
+            const uint in_offset = input_offset + get_local_id(get_group_id(0)) + i * INPUT0_Y_PITCH + k * INPUT0_FEATURE_PITCH;
             in[i] = input[in_offset];
         }
 
@@ -103,7 +103,7 @@ KERNEL(fused_conv_eltwise_gpu_bfyx_1x1_opt)(
             {
                 for(uint bc = 0; bc < OUT_BLOCK_WIDTH; bc++)
                 {
-                    slm_vals[SIMD_SIZE * (bc + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * bd)) + get_sub_group_local_id()] = dotProd0[bc + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * bd)];
+                    slm_vals[SIMD_SIZE * (bc + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * bd)) + get_local_id(get_group_id(0))] = dotProd0[bc + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * bd)];
                     dotProd0[bc + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * bd)] = dotProd1[bc + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * bd)];
                 }
             }
@@ -123,7 +123,7 @@ KERNEL(fused_conv_eltwise_gpu_bfyx_1x1_opt)(
             {
                 for(uint bc = 0; bc < OUT_BLOCK_WIDTH; bc++)
                 {
-                    slm_vals[SIMD_SIZE * (bc + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * (bd+OUT_BLOCK_DEPTH/2) )) + get_sub_group_local_id()] = dotProd1[bc + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * bd)];
+                    slm_vals[SIMD_SIZE * (bc + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * (bd+OUT_BLOCK_DEPTH/2) )) + get_local_id(get_group_id(0))] = dotProd1[bc + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * bd)];
                 }
             }
         }
@@ -137,7 +137,7 @@ KERNEL(fused_conv_eltwise_gpu_bfyx_1x1_opt)(
     #if BIAS_TERM
     for(uint bd = 0; bd < OUT_BLOCK_DEPTH/2; bd++)
     {
-        float _bias = biases[f + (bd + ifm_offset) * SIMD_SIZE + get_sub_group_local_id()];
+        float _bias = biases[f + (bd + ifm_offset) * SIMD_SIZE + get_local_id(get_group_id(0))];
         for(uint br = 0; br < OUT_BLOCK_HEIGHT; br++)
         {
             for(uint bc = 0; bc < OUT_BLOCK_WIDTH; bc++)
@@ -160,7 +160,7 @@ KERNEL(fused_conv_eltwise_gpu_bfyx_1x1_opt)(
         {
             for(uint bc = 0; bc < OUT_BLOCK_WIDTH; bc++)
             {
-                dotProd0[bc + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * bd)] += slm_vals[SIMD_SIZE * (bc + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * (bd + ifm_offset) )) + get_sub_group_local_id()];
+                dotProd0[bc + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * bd)] += slm_vals[SIMD_SIZE * (bc + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * (bd + ifm_offset) )) + get_local_id(get_group_id(0))];
                 dotProd0[bc + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * bd)] = ACTIVATION(dotProd0[bc + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * bd)], NL_M, NL_N);;
             }
         }
@@ -176,7 +176,7 @@ KERNEL(fused_conv_eltwise_gpu_bfyx_1x1_opt)(
         {
             for(uint bc = 0; bc < OUT_BLOCK_WIDTH; bc++)
             {
-                uint src3_offset = GET_DATA_INDEX(INPUT1, b, f + (bd + ifm_offset) * SIMD_SIZE + get_sub_group_local_id(), (group_y + br) * ELTW_STRIDE_Y, (group_x + bc) * ELTW_STRIDE_X);
+                uint src3_offset = GET_DATA_INDEX(INPUT1, b, f + (bd + ifm_offset) * SIMD_SIZE + get_local_id(get_group_id(0)), (group_y + br) * ELTW_STRIDE_Y, (group_x + bc) * ELTW_STRIDE_X);
                 dotProd0[bc + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * bd)] += src3[src3_offset];
                 dotProd0[bc + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * bd)] = ACTIVATION_ELTW(dotProd0[bc + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * bd)], NL_M_ELTW, NL_N_ELTW);
             }
@@ -192,7 +192,7 @@ KERNEL(fused_conv_eltwise_gpu_bfyx_1x1_opt)(
     {
         for(uint br = 0; br < OUT_BLOCK_HEIGHT; br++)
         {
-            uint dst_index = GET_DATA_INDEX(OUTPUT, b, f + (bd + ifm_offset) * SIMD_SIZE + get_sub_group_local_id(), group_y + br, group_x);
+            uint dst_index = GET_DATA_INDEX(OUTPUT, b, f + (bd + ifm_offset) * SIMD_SIZE + get_local_id(get_group_id(0)), group_y + br, group_x);
             uint out_vstore_offset = 0;
             #if (OUT_BLOCK_WIDTH >= 8)
             {

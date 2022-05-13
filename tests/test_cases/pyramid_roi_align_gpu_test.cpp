@@ -186,6 +186,7 @@ TEST(pyramidROIAlign_gpu, basic_functionality)
     int k = 0;
     for (float val1 : output_ptr)
     {
-        EXPECT_NEAR(val1, answer[k++], 1e-5);
+        // EXPECT_NEAR(val1, answer[k++], 1e-5);
+        EXPECT_NEAR(val1, answer[k++], 1e-4);
     }
 }

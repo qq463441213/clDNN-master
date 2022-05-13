@@ -62,7 +62,8 @@ KERNEL(convolution)(
     {
         for(uint i = 0; i < OUT_BLOCK_HEIGHT; i++)
         {
-            const uint in_offset = input_offset + get_sub_group_local_id() + i * INPUT0_Y_PITCH + k * INPUT0_FEATURE_PITCH;
+            //const uint in_offset = input_offset + get_local_id(get_group_id(0)) + i * INPUT0_Y_PITCH + k * INPUT0_FEATURE_PITCH;
+            const uint in_offset = input_offset + get_local_id(get_group_id(0)) + i * INPUT0_Y_PITCH + k * INPUT0_FEATURE_PITCH;
             in[i] = input[in_offset];
         }
 
@@ -102,7 +103,8 @@ KERNEL(convolution)(
             {
                 for(uint bc = 0; bc < OUT_BLOCK_WIDTH; bc++)
                 {
-                    slm_vals[bc + OUT_BLOCK_WIDTH * (get_sub_group_local_id() + SIMD_SIZE * (br + OUT_BLOCK_HEIGHT * bd))] = dotProd0[bc + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * bd)];
+                    // slm_vals[bc + OUT_BLOCK_WIDTH * (get_local_id(get_group_id(0)) + SIMD_SIZE * (br + OUT_BLOCK_HEIGHT * bd))] = dotProd0[bc + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * bd)];
+                    slm_vals[bc + OUT_BLOCK_WIDTH * (get_local_id(get_group_id(0)) + SIMD_SIZE * (br + OUT_BLOCK_HEIGHT * bd))] = dotProd0[bc + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * bd)];
                     dotProd0[bc + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * bd)] = dotProd1[bc + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * bd)];
                 }
             }
@@ -122,7 +124,8 @@ KERNEL(convolution)(
             {
                 uint width_offset = 0;
                 #if (OUT_BLOCK_WIDTH) >= 4
-                const uint slm_off = OUT_BLOCK_WIDTH * (get_sub_group_local_id() + SIMD_SIZE * (br + OUT_BLOCK_HEIGHT * (bd + OUT_BLOCK_DEPTH/2) ));
+                //const uint slm_off = OUT_BLOCK_WIDTH * (get_local_id(get_group_id(0)) + SIMD_SIZE * (br + OUT_BLOCK_HEIGHT * (bd + OUT_BLOCK_DEPTH/2) ));
+                const uint slm_off = OUT_BLOCK_WIDTH * (get_local_id(get_group_id(0)) + SIMD_SIZE * (br + OUT_BLOCK_HEIGHT * (bd + OUT_BLOCK_DEPTH/2) ));
                 float4 tmp = (float4)(dotProd1[width_offset + 0 + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * bd)],
                                       dotProd1[width_offset + 1 + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * bd)],
                                       dotProd1[width_offset + 2 + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * bd)],
@@ -132,7 +135,8 @@ KERNEL(convolution)(
                 #endif
                 for(uint bc = width_offset; bc < OUT_BLOCK_WIDTH; bc++)
                 {
-                    slm_vals[bc + OUT_BLOCK_WIDTH * (get_sub_group_local_id() + SIMD_SIZE * (br + OUT_BLOCK_HEIGHT * (bd+OUT_BLOCK_DEPTH/2) ))] = dotProd1[bc + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * bd)];
+                    // slm_vals[bc + OUT_BLOCK_WIDTH * (get_local_id(get_group_id(0)) + SIMD_SIZE * (br + OUT_BLOCK_HEIGHT * (bd+OUT_BLOCK_DEPTH/2) ))] = dotProd1[bc + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * bd)];
+                    slm_vals[bc + OUT_BLOCK_WIDTH * (get_local_id(get_group_id(0)) + SIMD_SIZE * (br + OUT_BLOCK_HEIGHT * (bd+OUT_BLOCK_DEPTH/2) ))] = dotProd1[bc + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * bd)];
                 }
             }
         }
@@ -146,7 +150,8 @@ KERNEL(convolution)(
     #if BIAS_TERM
     for(uint bd = 0; bd < OUT_BLOCK_DEPTH/2; bd++)
     {
-        float _bias = biases[f + (bd + ifm_offset) * SIMD_SIZE + get_sub_group_local_id()];
+        // float _bias = biases[f + (bd + ifm_offset) * SIMD_SIZE + get_local_id(get_group_id(0))];
+        float _bias = biases[f + (bd + ifm_offset) * SIMD_SIZE + get_local_id(get_group_id(0))];
         for(uint br = 0; br < OUT_BLOCK_HEIGHT; br++)
         {
             for(uint bc = 0; bc < OUT_BLOCK_WIDTH; bc++)
@@ -169,7 +174,7 @@ KERNEL(convolution)(
         {
             uint width_offset = 0;
             #if (OUT_BLOCK_WIDTH) >= 4
-            const uint slm_off = OUT_BLOCK_WIDTH * (get_sub_group_local_id() + SIMD_SIZE * (br + OUT_BLOCK_HEIGHT * (bd + ifm_offset) ));
+            const uint slm_off = OUT_BLOCK_WIDTH * (get_local_id(get_group_id(0)) + SIMD_SIZE * (br + OUT_BLOCK_HEIGHT * (bd + ifm_offset) ));
             float4 tmp = vload4(0, slm_p + slm_off);
             dotProd0[0 + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * bd)] += tmp[0];
             dotProd0[1 + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * bd)] += tmp[1];
@@ -186,7 +191,7 @@ KERNEL(convolution)(
 
             for(uint bc = width_offset; bc < OUT_BLOCK_WIDTH; bc++)
             {
-                dotProd0[bc + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * bd)] += slm_vals[bc + OUT_BLOCK_WIDTH * (get_sub_group_local_id() + SIMD_SIZE * (br + OUT_BLOCK_HEIGHT * (bd + ifm_offset) ))];
+                dotProd0[bc + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * bd)] += slm_vals[bc + OUT_BLOCK_WIDTH * (get_local_id(get_group_id(0)) + SIMD_SIZE * (br + OUT_BLOCK_HEIGHT * (bd + ifm_offset) ))];
                 dotProd0[bc + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * bd)] = ACTIVATION(dotProd0[bc + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * bd)], NL_M, NL_N);;
             }
         }
@@ -200,7 +205,7 @@ KERNEL(convolution)(
     {
         for(uint br = 0; br < OUT_BLOCK_HEIGHT; br++)
         {
-            uint dst_index = GET_DATA_INDEX(OUTPUT, b, f + (bd + ifm_offset) * SIMD_SIZE + get_sub_group_local_id(), group_y + br, group_x);
+            uint dst_index = GET_DATA_INDEX(OUTPUT, b, f + (bd + ifm_offset) * SIMD_SIZE + get_local_id(get_group_id(0)), group_y + br, group_x);
             uint out_vstore_offset = 0;
             #if (OUT_BLOCK_WIDTH >= 8)
             float8 tmp = (float8)(dotProd0[out_vstore_offset + 0 + OUT_BLOCK_WIDTH * (br + OUT_BLOCK_HEIGHT * bd)],

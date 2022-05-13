@@ -234,8 +234,8 @@ KERNEL(convolution_gpu_winograd_2x3_s1_fused)
 
                 // Fetch 4 channels of Winograd filter components.
                 //uint2 coordU = coordU0;
-				//uint coordU_x = coordU0.x + get_sub_group_local_id()%8;
-				const uint flatA = coordU0.y*FILTER_OFM_NUM*KCOLSW*KROWSW + coordU0.x + get_sub_group_local_id()%8;
+				//uint coordU_x = coordU0.x + get_local_id(get_group_id(0))%8;
+				const uint flatA = coordU0.y*FILTER_OFM_NUM*KCOLSW*KROWSW + coordU0.x + get_local_id(get_group_id(0))%8;
                 const UNIT_TYPE_4 f0 = (UNIT_TYPE_4)(
 				*(__global UNIT_TYPE *)(&U[flatA+0*FILTER_OFM_NUM*KCOLSW*KROWSW]), // as_UNIT_TYPE_4(intel_sub_group_block_read4(U, coordU));
 				*(__global UNIT_TYPE *)(&U[flatA+1*FILTER_OFM_NUM*KCOLSW*KROWSW]), // as_UNIT_TYPE_4(intel_sub_group_block_read4(U, coordU));

@@ -54,7 +54,7 @@ KERNEL(fully_connected_gpu_fs_byx_fsv32)(
     if (OUTPUT_BATCH_NUM % (WG_HEIGHT * OUTPUT_BLOCK_SIZE_B) != 0 && ob > OUTPUT_BATCH_NUM)
         return;
 #endif
-    const uint sglid = get_sub_group_local_id();
+    const uint sglid = get_local_id(get_group_id(0));
 
     UNIT_TYPE2 in[OUTPUT_BLOCK_SIZE_B] = { };
     UNIT_TYPE2 out[OUTPUT_BLOCK_SIZE_B] = { };

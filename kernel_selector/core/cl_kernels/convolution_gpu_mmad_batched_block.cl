@@ -72,9 +72,9 @@ KERNEL(convolution_mmad_batched_block)(
     const uint b_f = (get_group_id(2) * WG_BATCH_COUNT + get_sub_group_id());
 
 #if WEIGHTS_PER_WORKITEM == 4
-    const uint f = (b_f * 32 + get_sub_group_local_id() * 4) % FILTER_OFM_ALIGNED;
+    const uint f = (b_f * 32 + get_local_id(get_group_id(0)) * 4) % FILTER_OFM_ALIGNED;
 #else
-    const uint f = ((b_f * WEIGHTS_PER_WORKITEM * 8) + get_sub_group_local_id() ) % FILTER_OFM_ALIGNED;
+    const uint f = ((b_f * WEIGHTS_PER_WORKITEM * 8) + get_local_id(get_group_id(0)) ) % FILTER_OFM_ALIGNED;
 #endif
     const uint b_block = (b_f * 8 * WEIGHTS_PER_WORKITEM) / FILTER_OFM_ALIGNED;
 
@@ -149,7 +149,8 @@ uint dst_index = GET_DATA_FS_BS_YX_BSV4_FSV32_INDEX(OUTPUT, b_block*4, f, y, x);
 __attribute__((opencl_unroll_hint(OUT_BLOCK_WIDTH)))
 for(uint o = 0; o < OUT_BLOCK_WIDTH; o++)
 {
-    uint4 to_output;
+    // uint4 to_output;
+    uint to_output[4];
     __attribute__((opencl_unroll_hint(4)))
     for(uint b = 0; b < 4; b++)
     {

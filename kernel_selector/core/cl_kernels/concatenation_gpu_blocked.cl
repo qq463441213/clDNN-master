@@ -46,7 +46,8 @@ KERNEL (concatenation_gpu_blocked)(__global UNIT_TYPE* input, __global UNIT_TYPE
     const int b = get_global_id(0);
     const int f_block = get_group_id(1);
     const int xy = get_global_id(2);
-    const int lid = get_sub_group_local_id();
+    // const int lid = get_local_id(get_group_id(0));get_local_id(gid)
+    const int lid = get_local_id(get_group_id(0))
 
     const int x = xy % OUTPUT_SIZE_X;
     const int y = xy / OUTPUT_SIZE_X;

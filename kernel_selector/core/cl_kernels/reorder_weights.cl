@@ -113,7 +113,7 @@ KERNEL (reorder_weights)(const __global INPUT0_TYPE* input, write_only image2d_t
     MAKE_VECTOR_TYPE(UNIT_TYPE, 4) input_val = (MAKE_VECTOR_TYPE(UNIT_TYPE, 4))(UNIT_VAL_ZERO, UNIT_VAL_ZERO, UNIT_VAL_ZERO, UNIT_VAL_ZERO);
     const int2 coord = (int2)(o, iyx);
     uint4 ir = FUNC_CALL(reshape_dims)(o,i,y,x, OUTPUT_SIZE_Y, OUTPUT_SIZE_X, INPUT0_SIZE_Y, INPUT0_SIZE_X, OUTPUT_DIMS, INPUT0_DIMS);
-    input_val.s0 = TO_OUTPUT_TYPE(input[FUNC_CALL(get_input_index)(ir[0],ir[1],ir[2],ir[3])]);
+    input_val.s0 = TO_OUTPUT_TYPE(input[FUNC_CALL(get_input_index)(ir.s0,ir.s1,ir.s2,ir.s3)]);
     IMAGE_WRITE(output, coord, input_val);
 }
 #else
