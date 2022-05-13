@@ -68,7 +68,8 @@ KERNEL (reorder_data_to_yxfb_batched)(
 
     for(uint i = 0; i < OUTPUT_BATCH_NUM; i++)
     {
-        uint output_idx = group_idx + get_sub_group_local_id();
+        // uint output_idx = group_idx + get_sub_group_local_id(); @LY 2022/5/13
+        uint output_idx = group_idx + get_local_id(group_idx);
         if(output_idx >= ELEMENTS_COUNT)
             continue;
 
@@ -88,7 +89,7 @@ KERNEL (reorder_data_to_yxfb_batched)(
     #else
         MEAN_SUBTRACT_TYPE res = TO_MEAN_TYPE(input[input_idx]);
         uint4 msv = FUNC_CALL(reshape_dims)(b,f,y,x, INPUT0_SIZE_Y, INPUT0_SIZE_X, MEAN_SUBTRACT_SIZE_Y, MEAN_SUBTRACT_SIZE_X, INPUT0_DIMS, MEAN_SUBTRACT_DIMS);
-        res = MEAN_OP(res, mean_subtract[GET_DATA_INDEX_SAFE(MEAN_SUBTRACT, msv[0], msv[1], msv[2], msv[3])]);
+        res = MEAN_OP(res, mean_subtract[GET_DATA_INDEX_SAFE(MEAN_SUBTRACT, msv.s0, msv.s1, msv.s2, msv.s3)]);
     #endif
     #else
         CALC_TYPE res = TO_CALC_TYPE(input[input_idx]);
